@@ -10,7 +10,7 @@
           height="150"
         width="250">
         <v-list-item
-          v-for="{username, avatar_url, name} in users"
+          v-for="{username, avatar_url, name} in filteredUsers"
           :key="username">
           <v-list-item-avatar>
             <v-img
@@ -44,8 +44,10 @@ export default {
   name: 'HypCommentBox',
   data: () => ({
     comment: '',
+    value: '',
     listActive: false,
     users: [],
+    atSignPosition: null,
     positionX: 0,
     positionY: 35,
   }),
@@ -56,12 +58,27 @@ export default {
         this.users = json.users
       })
   },
+  computed: {
+    filteredUsers() {
+        const rawValue = this.value.substring(1)
+        const filteredUsers = this.users.filter(user => (
+          user.name.toLowerCase().includes(rawValue.toLowerCase()) ||
+          user.username.toLowerCase().includes(rawValue.toLowerCase())
+        ))
+      return (filteredUsers.length ? filteredUsers : this.users)
+    },
+  },
   methods: {
     onKeyChange(event) {
       if (event.key === AT_KEY) {
         this.positionX = this.$refs.textarea.$el.offsetLeft
+        this.atSignPosition = this.comment.lastIndexOf('@')
         this.listActive = true
         return
+      }
+      if (this.listActive) {
+        this.value = this.comment.slice(this.atSignPosition)
+        if(this.value === '') this.listActive = false 
       }
     },
   }    

@@ -1,4 +1,5 @@
-import { shallowMount } from '@vue/test-utils'
+import { createLocalVue, mount } from '@vue/test-utils'
+import Vuetify from 'vuetify'
 import HypCommentBox from '@/components/comment-box.vue'
 
 const mockData = [
@@ -25,21 +26,30 @@ global.fetch = jest.fn(() =>
   })
 );
 
-let wrapper
+let wrapper, vuetify, localVue
 
 beforeEach(() => {
   fetch.mockClear()
-  wrapper = shallowMount(HypCommentBox)
+  vuetify = new Vuetify()
+  localVue = createLocalVue()
+  wrapper = mount(HypCommentBox, {localVue, vuetify})
 })
 
-const userList = () => wrapper.findComponent({ ref: 'menu' })
-const commentBox = () => wrapper.findComponent({ ref: 'textarea' })
+const userList = () => wrapper.findComponent({name: 'VMenu'})
+const commentBox = () => wrapper.findComponent({name: 'VTextarea'})
 
 
 describe('HypCommentBox', () => {
   it('shows user list when `@` is typed', async () => {
-    await commentBox().vm.$emit('input', '@')
+    await wrapper.vm.onKeyChange({key: '@'})
 
-    expect(userList().isVisible()).toBe(true)
+    expect(userList().props('value')).toBe(true)
+  })
+
+  it('filters users by typing after `@` sign', async () => {
+    await wrapper.vm.onKeyChange({ key: '@' })
+    await wrapper.setData({ value: '@lau' })
+
+    expect(userList().findAllComponents('.v-list-item').at(0).text()).toBe('Laura Montgomery')
   })
 })
