@@ -30,22 +30,23 @@
       class="comment-box__textarea"
       v-model="comment"
       outlined
-      clearable
       hint="Use '@' to reference another user"
       color="#202020"
       label="Comment"
-      @keyup="onKeyChange"/>
+      @keyup="onKeyChange"
+      @keydown="onKeyDown"/>
   </div>
 </template>
 
 <script>
 const AT_KEY = '@'
+const ESCAPE_KEY = 'Escape'
 
 export default {
   name: 'HypCommentBox',
   data: () => ({
     comment: '',
-    value: '',
+    input: '',
     listActive: false,
     users: [],
     atSignPosition: null,
@@ -61,7 +62,7 @@ export default {
   },
   computed: {
     filteredUsers() {
-        const rawValue = this.value.substring(1)
+        const rawValue = this.input.substring(1)
         const filteredUsers = this.users.filter(user => (
           user.name.toLowerCase().includes(rawValue.toLowerCase()) ||
           user.username.toLowerCase().includes(rawValue.toLowerCase())
@@ -77,15 +78,24 @@ export default {
         this.listActive = true
         return
       }
-      if (this.listActive) {
-        this.value = this.comment.slice(this.atSignPosition)
-        if(this.value === '') this.listActive = false 
+      if (event.key === ESCAPE_KEY && this.listActive) {
+        this.input = ''
+        this.atSignPosition = null
+        this.listActive = false
+        return
       }
+      if (this.listActive) {
+        this.input = this.comment.slice(this.atSignPosition)
+        if(this.input === '') this.listActive = false 
+      }
+    },
+    onKeyDown(event) {
+      if (this.listActive) this.$refs.menu.onKeyDown(event)
     },
     setUser(name) {
       this.comment = this.comment.slice(0, this.atSignPosition)
       this.comment += name + ' '
-      this.value = ''
+      this.input = ''
       this.listActive = false
     },
   }    

@@ -49,7 +49,7 @@ describe('HypCommentBox', () => {
 
   it('filters users by typing after `@` sign', async () => {
     await wrapper.vm.onKeyChange({ key: '@' })
-    await wrapper.setData({ value: '@lau' })
+    await wrapper.setData({ input: '@lau' })
 
     expect(userList().findAllComponents('.v-list-item').at(0).text()).toBe('Laura Montgomery')
   })
