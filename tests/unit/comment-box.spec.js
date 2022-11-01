@@ -32,6 +32,7 @@ beforeEach(() => {
   fetch.mockClear()
   vuetify = new Vuetify()
   localVue = createLocalVue()
+  document.body.setAttribute('data-app', true)
   wrapper = mount(HypCommentBox, {localVue, vuetify})
 })
 
@@ -51,5 +52,13 @@ describe('HypCommentBox', () => {
     await wrapper.setData({ value: '@lau' })
 
     expect(userList().findAllComponents('.v-list-item').at(0).text()).toBe('Laura Montgomery')
+  })
+
+  it('select a user by clicking it from the list and close the user list', async () => {
+    await wrapper.vm.onKeyChange({ key: '@' })
+    await userList().findAllComponents('.v-list-item').at(1).trigger('click')
+
+    expect(commentBox().props('value')).toBe('Raymond Murray ')
+    expect(userList().props('value')).toBe(false)
   })
 })

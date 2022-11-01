@@ -11,7 +11,8 @@
         width="250">
         <v-list-item
           v-for="{username, avatar_url, name} in filteredUsers"
-          :key="username">
+          :key="username"
+          @click="setUser(name)">
           <v-list-item-avatar>
             <v-img
               :alt="`${username} avatar`"
@@ -80,6 +81,12 @@ export default {
         this.value = this.comment.slice(this.atSignPosition)
         if(this.value === '') this.listActive = false 
       }
+    },
+    setUser(name) {
+      this.comment = this.comment.slice(0, this.atSignPosition)
+      this.comment += name + ' '
+      this.value = ''
+      this.listActive = false
     },
   }    
 }
