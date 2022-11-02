@@ -33,12 +33,11 @@ beforeEach(() => {
   vuetify = new Vuetify()
   localVue = createLocalVue()
   document.body.setAttribute('data-app', true)
-  wrapper = mount(HypCommentBox, {localVue, vuetify})
+  wrapper = mount(HypCommentBox, {localVue, vuetify,  attachTo: document.body})
 })
 
 const userList = () => wrapper.findComponent({name: 'VMenu'})
 const commentBox = () => wrapper.findComponent({name: 'VTextarea'})
-
 
 describe('HypCommentBox', () => {
   it('shows user list when `@` is typed', async () => {
@@ -54,11 +53,22 @@ describe('HypCommentBox', () => {
     expect(userList().findAllComponents('.v-list-item').at(0).text()).toBe('Laura Montgomery')
   })
 
-  it('select a user by clicking it from the list and close the user list', async () => {
-    await wrapper.vm.onKeyChange({ key: '@' })
-    await userList().findAllComponents('.v-list-item').at(1).trigger('click')
+  describe('on click user from list', () => {
+    beforeEach(async () => {
+      await wrapper.vm.onKeyChange({ key: '@' })
+      await userList().findAllComponents('.v-list-item').at(1).trigger('click')
+    })
 
-    expect(commentBox().props('value')).toBe('Raymond Murray ')
-    expect(userList().props('value')).toBe(false)
+    it('selects the user', () => {
+      expect(commentBox().props('value')).toBe('Raymond Murray ')
+    })
+
+    it('closes the user list', () => {
+      expect(userList().props('value')).toBe(false)
+    })
+
+    it('focus cursor on text area', () => {
+      expect(commentBox().html()).toContain(document.activeElement.outerHTML)
+    })
   })
 })

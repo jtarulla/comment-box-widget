@@ -12,7 +12,7 @@
         <v-list-item
           v-for="{username, avatar_url, name} in filteredUsers"
           :key="username"
-          @click="setUser(name)">
+          @click="setUser(name), $refs.textarea.focus()">
           <v-list-item-avatar>
             <v-img
               :alt="`${username} avatar`"
@@ -62,10 +62,10 @@ export default {
   },
   computed: {
     filteredUsers() {
-        const rawValue = this.input.substring(1)
+        const rawInput = this.input.substring(1)
         const filteredUsers = this.users.filter(user => (
-          user.name.toLowerCase().includes(rawValue.toLowerCase()) ||
-          user.username.toLowerCase().includes(rawValue.toLowerCase())
+          user.name.toLowerCase().includes(rawInput.toLowerCase()) ||
+          user.username.toLowerCase().includes(rawInput.toLowerCase())
         ))
       return (filteredUsers.length ? filteredUsers : this.users)
     },
@@ -80,9 +80,7 @@ export default {
       }
       if (event.key === ESCAPE_KEY && this.listActive) {
         this.input = ''
-        this.atSignPosition = null
         this.listActive = false
-        return
       }
       if (this.listActive) {
         this.input = this.comment.slice(this.atSignPosition)
